@@ -105,14 +105,104 @@
             100% { opacity: 1; }
         }
         
-        /* Mobilní menu */
+        /* MOBILNÍ MENU - VYLEPŠENÉ */
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
         .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 280px;
+            height: 100vh;
+            background: rgba(212, 179, 136, 0.98);
+            backdrop-filter: blur(20px);
             transform: translateX(100%);
             transition: transform 0.3s ease;
+            z-index: 50;
+            padding: 2rem;
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.2);
         }
         
         .mobile-menu.open {
             transform: translateX(0);
+        }
+        
+        .mobile-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .mobile-menu-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu-close:hover {
+            transform: scale(1.1);
+        }
+        
+        .mobile-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .mobile-link {
+            color: white;
+            text-decoration: none;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        .mobile-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .mobile-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+            border-left: 4px solid white;
+        }
+        
+        .mobile-link::after {
+            content: '›';
+            position: absolute;
+            right: 1.5rem;
+            opacity: 0.7;
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-link:hover::after {
+            transform: translateX(3px);
         }
         
         /* Ztmavené překryvy pro lepší čitelnost */
@@ -196,17 +286,23 @@
         </div>
     </nav>
 
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileOverlay"></div>
+
     <!-- Mobile Menu -->
-    <div id="mobileMenu" class="mobile-menu fixed inset-y-0 right-0 w-64 bg-creamy-500 text-white shadow-xl z-50 p-6">
-        <button id="closeMobileMenu" class="absolute top-4 right-4">
-            <i data-feather="x" class="w-6 h-6"></i>
-        </button>
-        <div class="mt-12 space-y-6">
-            <a href="#home" class="block text-xl hover:text-creamy-200 transition">Domů</a>
-            <a href="#menu" class="block text-xl hover:text-creamy-200 transition">Menu</a>
-            <a href="#gallery" class="block text-xl hover:text-creamy-200 transition">Galerie</a>
-            <a href="#about" class="block text-xl hover:text-creamy-200 transition">O nás</a>
-            <a href="#contact" class="block text-xl hover:text-creamy-200 transition">Kontakt</a>
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h3 class="text-2xl font-serif font-bold">Menu</h3>
+            <button id="closeMobileMenu" class="mobile-menu-close">
+                <i data-feather="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+        <div class="mobile-links">
+            <a href="#home" class="mobile-link">Domů</a>
+            <a href="#menu" class="mobile-link">Menu</a>
+            <a href="#gallery" class="mobile-link">Galerie</a>
+            <a href="#about" class="mobile-link">O nás</a>
+            <a href="#contact" class="mobile-link">Kontakt</a>
         </div>
     </div>
 
@@ -373,6 +469,8 @@
         </div>
     </section>
 
+    <!-- Footer -->
+
     <custom-footer></custom-footer>
 
     <!-- Scripty -->
@@ -402,24 +500,49 @@
             highlightActiveSection();
         });
 
-        // Mobilní menu
+        // Mobilní menu funkce
         const mobileMenuButton = document.getElementById('mobileMenuButton');
         const mobileMenu = document.getElementById('mobileMenu');
+        const mobileOverlay = document.getElementById('mobileOverlay');
         const closeMobileMenu = document.getElementById('closeMobileMenu');
 
-        mobileMenuButton.addEventListener('click', function() {
+        const openMobileMenu = () => {
             mobileMenu.classList.add('open');
-        });
+            mobileOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
 
-        closeMobileMenu.addEventListener('click', function() {
+        const closeMobileMenuFunc = () => {
             mobileMenu.classList.remove('open');
-        });
+            mobileOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+
+        mobileMenuButton.addEventListener('click', openMobileMenu);
+        closeMobileMenu.addEventListener('click', closeMobileMenuFunc);
+        mobileOverlay.addEventListener('click', closeMobileMenuFunc);
 
         // Zavření mobilního menu po kliknutí na odkaz
-        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+        const mobileMenuLinks = document.querySelectorAll('.mobile-link');
         mobileMenuLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                mobileMenu.classList.remove('open');
+            link.addEventListener('click', closeMobileMenuFunc);
+        });
+
+        // Smooth scroll pro všechny odkazy
+        const allLinks = document.querySelectorAll('a[href^="#"]');
+        allLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href !== '#') {
+                    e.preventDefault();
+                    const targetElement = document.querySelector(href);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }
             });
         });
 
@@ -427,6 +550,7 @@
         function highlightActiveSection() {
             const sections = document.querySelectorAll('section');
             const navLinks = document.querySelectorAll('.nav-link');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
             
             let currentSection = '';
             
@@ -438,7 +562,16 @@
                 }
             });
             
+            // Aktualizace desktop navigace
             navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Aktualizace mobilní navigace
+            mobileLinks.forEach(link => {
                 link.classList.remove('active');
                 if (link.getAttribute('href') === `#${currentSection}`) {
                     link.classList.add('active');
@@ -448,6 +581,13 @@
 
         // Inicializace zvýraznění aktivní sekce
         highlightActiveSection();
+
+        // ESC klávesa pro zavření mobilního menu
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeMobileMenuFunc();
+            }
+        });
     </script>
 </body>
 </html>
