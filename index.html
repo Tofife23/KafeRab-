@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kafe Rabí | Elegantní kavárna</title>
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        /* Vlastní styly pro tooltipy a další efekty */
+        .tooltip {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 1000;
+        }
+        
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Pulzující CTA tlačítko */
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(201, 162, 110, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(201, 162, 110, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(201, 162, 110, 0); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Sticky navigace */
+        .sticky-nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .sticky-nav.scrolled {
+            background-color: rgba(212, 179, 136, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* VÝRAZNÉ MENU - Varianta 4 */
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: #FFF8F0;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 80%;
+        }
+
+        .nav-link.active {
+            font-weight: bold;
+            color: #FFF8F0 !important;
+            text-shadow: 0 0 10px rgba(255,248,240,0.5);
+        }
+
+        .nav-link.active::after {
+            width: 100%;
+            background: linear-gradient(90deg, #FFF8F0, #F5E6D6);
+            box-shadow: 0 0 15px rgba(255,248,240,0.6);
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        /* Mobilní menu */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        /* Ztmavené překryvy pro lepší čitelnost */
+        .dark-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+        
+        /* Hover efekty na kartách */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Galerie s popisky */
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-item:hover .gallery-caption {
+            transform: translateY(0);
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        creamy: {
+                            100: '#FFF8F0',
+                            200: '#F5E6D6',
+                            300: '#EAD5BC',
+                            400: '#DFC4A2',
+                            500: '#D4B388',
+                            600: '#C9A26E',
+                            700: '#BE9154',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-creamy-100 font-sans">
+    <!-- Sticky Navigation -->
+    <nav id="mainNav" class="sticky-nav bg-creamy-500 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#home" class="text-2xl font-serif font-bold">Kafe Rabí</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#home" class="nav-link hover:text-creamy-200 transition">Domů</a>
+                <a href="#menu" class="nav-link hover:text-creamy-200 transition">Menu</a>
+                <a href="#gallery" class="nav-link hover:text-creamy-200 transition">Galerie</a>
+                <a href="#about" class="nav-link hover:text-creamy-200 transition">O nás</a>
+                <a href="#contact" class="nav-link hover:text-creamy-200 transition">Kontakt</a>
+            </div>
+            <button id="mobileMenuButton" class="md:hidden focus:outline-none">
+                <i data-feather="menu" class="w-6 h-6"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu fixed inset-y-0 right-0 w-64 bg-creamy-500 text-white shadow-xl z-50 p-6">
+        <button id="closeMobileMenu" class="absolute top-4 right-4">
+            <i data-feather="x" class="w-6 h-6"></i>
+        </button>
+        <div class="mt-12 space-y-6">
+            <a href="#home" class="block text-xl hover:text-creamy-200 transition">Domů</a>
+            <a href="#menu" class="block text-xl hover:text-creamy-200 transition">Menu</a>
+            <a href="#gallery" class="block text-xl hover:text-creamy-200 transition">Galerie</a>
+            <a href="#about" class="block text-xl hover:text-creamy-200 transition">O nás</a>
+            <a href="#contact" class="block text-xl hover:text-creamy-200 transition">Kontakt</a>
+        </div>
+    </div>
+
+    <!-- Fullscreen Hero Image -->
+    <section id="home" class="relative h-screen">
+        <div class="dark-overlay"></div>
+        <img src="http://static.photos/food/1200x630/10" alt="Kavárna Rabí" class="w-full h-full object-cover">
+        <div class="absolute inset-0 flex items-center justify-center z-10">
+            <div class="text-center px-4" data-aos="fade-up" data-aos-duration="1000">
+                <h1 class="text-5xl md:text-7xl font-serif font-bold text-white mb-6">Kafe Rabí</h1>
+                <p class="text-xl md:text-2xl text-creamy-200 mb-8">Výjimečná káva v elegantním prostředí</p>
+                <a href="#menu" class="inline-block px-8 py-3 bg-gradient-to-r from-creamy-200 to-creamy-300 text-creamy-700 font-bold rounded-full hover:from-creamy-600 hover:to-creamy-700 hover:text-white transition shadow-lg pulse-animation">Prohlédnout menu</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modern Menu Section -->
+    <section id="menu" class="py-24 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="text-creamy-500 font-bold tracking-widest">NABÍDKA</span>
+                <h2 class="text-5xl font-serif font-bold text-creamy-700 mt-4 mb-6">Kávové speciality</h2>
+                <div class="w-24 h-1 bg-creamy-500 mx-auto"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- Coffee Section -->
+                <div class="relative rounded-xl overflow-hidden shadow-xl card-hover" data-aos="fade-right" data-aos-delay="200">
+                    <div class="dark-overlay"></div>
+                    <img src="http://static.photos/food/640x360/25" alt="Naše kávové speciality" class="w-full h-96 object-cover transition-transform duration-500 group-hover:scale-105">
+                    <div class="absolute inset-0 flex items-end p-6 z-10">
+                        <div class="text-white">
+                            <h3 class="text-2xl font-bold mb-2">Kávové speciality</h3>
+                            <a href="/menu.html#kavy" class="inline-flex items-center mt-4 px-6 py-2 bg-gradient-to-r from-creamy-200 to-creamy-300 text-creamy-700 rounded-full font-bold hover:from-creamy-600 hover:to-creamy-700 hover:text-white transition shadow-lg hover:shadow-xl text-sm">
+                                Prohlédnout kávy
+                                <i data-feather="arrow-right" class="inline w-4 h-4 ml-1 tooltip" data-tooltip="Zobrazit kávové speciality"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Desserts Section -->
+                <div class="relative rounded-xl overflow-hidden shadow-xl card-hover" data-aos="fade-left" data-aos-delay="200">
+                    <div class="dark-overlay"></div>
+                    <img src="http://static.photos/food/640x360/26" alt="Naše dezerty" class="w-full h-96 object-cover transition-transform duration-500 group-hover:scale-105">
+                    <div class="absolute inset-0 flex items-end p-6 z-10">
+                        <div class="text-white">
+                            <h3 class="text-2xl font-bold mb-2">Sladké pokušení</h3>
+                            <a href="/menu.html#dezerty" class="inline-flex items-center mt-4 px-6 py-2 bg-gradient-to-r from-creamy-200 to-creamy-300 text-creamy-700 rounded-full font-bold hover:from-creamy-600 hover:to-creamy-700 hover:text-white transition shadow-lg hover:shadow-xl text-sm">
+                                Prohlédnout dezerty
+                                <i data-feather="arrow-right" class="inline w-4 h-4 ml-1 tooltip" data-tooltip="Zobrazit dezerty"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-20 bg-creamy-200">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-serif font-bold text-center text-creamy-700 mb-6" data-aos="fade-up">Náš svět</h2>
+            <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12" data-aos="fade-up" data-aos-delay="100">Přijďte se podívat do naší útulné kavárny s jedinečnou atmosférou.</p>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12">
+                <div class="gallery-item rounded-lg overflow-hidden shadow-md" data-aos="zoom-in" data-aos-delay="200">
+                    <img src="http://static.photos/food/640x360/17" alt="Interiér kavárny" class="w-full h-48 object-cover transition-transform duration-300 hover:scale-105">
+                    <div class="gallery-caption">Interiér kavárny</div>
+                </div>
+                <div class="gallery-item rounded-lg overflow-hidden shadow-md" data-aos="zoom-in" data-aos-delay="300">
+                    <img src="http://static.photos/food/640x360/18" alt="Příprava kávy" class="w-full h-48 object-cover transition-transform duration-300 hover:scale-105">
+                    <div class="gallery-caption">Příprava kávy</div>
+                </div>
+                <div class="gallery-item rounded-lg overflow-hidden shadow-md hidden md:block" data-aos="zoom-in" data-aos-delay="400">
+                    <img src="http://static.photos/food/640x360/19" alt="Zákazníci" class="w-full h-48 object-cover transition-transform duration-300 hover:scale-105">
+                    <div class="gallery-caption">Naši zákazníci</div>
+                </div>
+                <div class="gallery-item rounded-lg overflow-hidden shadow-md" data-aos="zoom-in" data-aos-delay="500">
+                    <img src="http://static.photos/food/640x360/20" alt="Venkovní posezení" class="w-full h-48 object-cover transition-transform duration-300 hover:scale-105">
+                    <div class="gallery-caption">Venkovní posezení</div>
+                </div>
+                <div class="gallery-item rounded-lg overflow-hidden shadow-md" data-aos="zoom-in" data-aos-delay="600">
+                    <img src="http://static.photos/food/640x360/21" alt="Kávové zrno" class="w-full h-48 object-cover transition-transform duration-300 hover:scale-105">
+                    <div class="gallery-caption">Kávové zrno</div>
+                </div>
+                <div class="gallery-item rounded-lg overflow-hidden shadow-md hidden md:block" data-aos="zoom-in" data-aos-delay="700">
+                    <img src="http://static.photos/food/640x360/22" alt="Dezerty" class="w-full h-48 object-cover transition-transform duration-300 hover:scale-105">
+                    <div class="gallery-caption">Čerstvé dezerty</div>
+                </div>
+            </div>
+            
+            <div class="text-center" data-aos="fade-up" data-aos-delay="800">
+                <a href="#contact" class="inline-block bg-gradient-to-r from-creamy-200 to-creamy-300 text-creamy-700 text-lg py-3 px-8 rounded-full font-bold hover:from-creamy-600 hover:to-creamy-700 hover:text-white transition shadow-md hover:shadow-lg pulse-animation">Prohlédnout celou galerii</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modern About Section -->
+    <section id="about" class="py-24 bg-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-creamy-100 opacity-10"></div>
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="text-creamy-500 font-bold tracking-widest">PŘÍBĚH</span>
+                <h2 class="text-5xl font-serif font-bold text-creamy-700 mt-4 mb-6">Náš příběh</h2>
+                <div class="w-24 h-1 bg-creamy-500 mx-auto"></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
+                <div class="relative group" data-aos="fade-right">
+                    <div class="absolute -inset-4 bg-gradient-to-r from-creamy-400 to-creamy-600 rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-500"></div>
+                    <div class="relative bg-white rounded-xl shadow-2xl overflow-hidden card-hover">
+                        <img src="http://static.photos/people/640x360/23" alt="Majitelé kavárny" class="w-full h-full object-cover transform group-hover:scale-105 transition duration-500">
+                    </div>
+                </div>
+
+                <div class="space-y-6" data-aos="fade-left">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 bg-creamy-100 p-3 rounded-full tooltip" data-tooltip="Začátek naší cesty">
+                            <i data-feather="coffee" class="w-6 h-6 text-creamy-700"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Začátek naší cesty</h3>
+                            <p class="text-gray-600">Kavárna Rabí vznikla z vášně pro dokonalou kávu a autentické zážitky. Začali jsme jako malý rodinný podnik s vizí vytvořit místo, kde se lidé cítí jako doma.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 bg-creamy-100 p-3 rounded-full tooltip" data-tooltip="Káva s příběhem">
+                            <i data-feather="globe" class="w-6 h-6 text-creamy-700"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Káva s příběhem</h3>
+                            <p class="text-gray-600">Spolupracujeme přímo s pěstiteli z Kolumbie, Etiopie a Brazílie. Každé zrnko vypráví příběh svého původu, který vynikne díky našemu lokálnímu pražení.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 bg-creamy-100 p-3 rounded-full tooltip" data-tooltip="10 let zkušeností">
+                            <i data-feather="heart" class="w-6 h-6 text-creamy-700"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">10 let zkušeností</h3>
+                            <p class="text-gray-600">Za dekádu existence jsme vytvořili komunitu milovníků kávy. Naše know-how předáváme dál prostřednictvím baristických kurzů a degustací.</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-6">
+                        <a href="#contact" class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-creamy-200 to-creamy-300 text-creamy-700 rounded-full font-bold hover:from-creamy-600 hover:to-creamy-700 hover:text-white shadow-lg hover:shadow-xl transition-all hover:translate-y-1 pulse-animation">
+                            Poznejte náš tým
+                            <i data-feather="arrow-right" class="w-5 h-5 ml-2 tooltip" data-tooltip="Přejít na kontakt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-creamy-200">
+        <div class="container mx-auto px-4 text-center" data-aos="fade-up">
+            <h2 class="text-3xl font-serif font-bold text-creamy-700 mb-4">Máte dotaz?</h2>
+            <p class="text-lg text-gray-600 mb-8 max-w-lg mx-auto">Rádi vám odpovíme na jakýkoliv dotaz týkající se naší kavárny.</p>
+            <a href="mailto:info@kaferabi.cz" class="inline-block bg-gradient-to-r from-creamy-200 to-creamy-300 text-creamy-700 text-lg py-3 px-8 rounded-full font-bold hover:from-creamy-600 hover:to-creamy-700 hover:text-white transition shadow-md hover:shadow-lg pulse-animation">Kontaktujte nás</a>
+        </div>
+    </section>
+
+    <custom-footer></custom-footer>
+
+    <!-- Scripty -->
+    <script src="components/footer.js"></script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        // Inicializace AOS (Animate On Scroll)
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+
+        // Inicializace Feather ikon
+        feather.replace();
+
+        // Sticky navigace
+        window.addEventListener('scroll', function() {
+            const nav = document.getElementById('mainNav');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+            
+            // Zvýraznění aktivní sekce
+            highlightActiveSection();
+        });
+
+        // Mobilní menu
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const closeMobileMenu = document.getElementById('closeMobileMenu');
+
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.add('open');
+        });
+
+        closeMobileMenu.addEventListener('click', function() {
+            mobileMenu.classList.remove('open');
+        });
+
+        // Zavření mobilního menu po kliknutí na odkaz
+        const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenu.classList.remove('open');
+            });
+        });
+
+        // Funkce pro zvýraznění aktivní sekce
+        function highlightActiveSection() {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.scrollY >= sectionTop - 100) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Inicializace zvýraznění aktivní sekce
+        highlightActiveSection();
+    </script>
+</body>
+</html>
